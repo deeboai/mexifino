@@ -1,213 +1,430 @@
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import TrialBookingForm from '../components/TrialBookingForm'
-import ScheduleTable from '../components/ScheduleTable'
-import ConceptBadge from '../components/ConceptBadge'
-import VideoBackground from '../components/VideoBackground'
-import Reveal from '../components/Reveal'
+import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { ArrowLeft, MapPin, Phone, Clock, Instagram } from 'lucide-react'
+import { TrialForm } from '../components/TrialForm'
+import { PitchBadge } from '../components/PitchBadge'
 
 const programs = [
-  { name: 'Boxing', copy: 'Technical, old-school boxing fundamentals — stance, defense, combinations.' },
-  { name: 'Kickboxing', copy: 'Boxing plus kicks — a full-body conditioning workout with real technique.' },
-  { name: 'Personal Training', copy: '1-on-1 sessions built around your goals, from first mitt work to fight-ready.' },
-  { name: 'Group Fitness', copy: 'High-energy classes for anyone who wants the workout, not the fight.' },
+  { name: 'Boxing', tag: "The core. Fundamentals every week, sparring when you're ready." },
+  { name: 'Kickboxing', tag: 'Hands and legs. Conditioning that hits different.' },
+  { name: 'Personal Training', tag: 'One-on-one with Coach Jesse. Sharp, specific, honest.' },
+  { name: 'Group Fitness', tag: 'Circuits, bag work, footwork drills. Show up, get after it.' },
 ]
 
-const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const rows = [
-  { time: '6:00a', classes: [{ day: 'Mon', label: 'Boxing' }, { day: 'Wed', label: 'Boxing' }, { day: 'Fri', label: 'Boxing' }] },
-  { time: '8:00a', classes: [{ day: 'Tue', label: 'Group Fitness' }, { day: 'Thu', label: 'Group Fitness' }] },
-  { time: '12:00p', classes: [{ day: 'Mon', label: 'Personal Training' }, { day: 'Wed', label: 'Personal Training' }] },
-  { time: '5:00p', classes: [{ day: 'Tue', label: 'Kickboxing' }, { day: 'Thu', label: 'Kickboxing' }] },
-  { time: '6:00p', classes: [{ day: 'Mon', label: 'Boxing' }, { day: 'Wed', label: 'Boxing' }, { day: 'Fri', label: 'Boxing' }] },
-  { time: '9:00a', classes: [{ day: 'Sat', label: 'Open gym' }] },
+const schedule = [
+  { day: 'Mon', classes: ['6:00 Fundamentals', '12:00 Fitness', '18:00 Boxing', '19:30 Kickboxing'] },
+  { day: 'Tue', classes: ['6:00 Boxing', '12:00 Group Fitness', '18:00 Kickboxing', '19:30 Sparring'] },
+  { day: 'Wed', classes: ['6:00 Fundamentals', '12:00 Fitness', '18:00 Boxing'] },
+  { day: 'Thu', classes: ['6:00 Boxing', '12:00 Group Fitness', '18:00 Kickboxing', '19:30 Open Gym'] },
+  { day: 'Fri', classes: ['6:00 Fundamentals', '12:00 Fitness', '18:00 Boxing', '19:30 Sparring'] },
+  { day: 'Sat', classes: ['9:00 Community Class', '10:30 Open Gym'] },
 ]
 
 export default function Mexifino() {
-  return (
-    <div className="min-h-screen bg-white text-neutral-900">
-      <ConceptBadge />
+  const heroRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
+  const wordmarkScale = useTransform(scrollYProgress, [0, 1], [1, 1.15])
+  const wordmarkY = useTransform(scrollYProgress, [0, 1], ['0%', '20%'])
+  const scrimOpacity = useTransform(scrollYProgress, [0, 1], [0.7, 1])
 
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', on)
+    return () => window.removeEventListener('scroll', on)
+  }, [])
+
+  return (
+    <main className="min-h-screen bg-black text-white">
       {/* Nav */}
-      <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:px-6">
-          <Link
-            to="/"
-            aria-label="Back to Northfield Fight Clubs"
-            className="shrink-0 text-xs uppercase tracking-widest text-neutral-400 hover:text-neutral-700"
-          >
-            <span aria-hidden>←</span> <span className="hidden sm:inline">Northfield Fight Clubs</span>
+      <motion.nav
+        initial={{ y: -80 }}
+        animate={{ y: 0 }}
+        transition={{ delay: 0.2 }}
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+          scrolled ? 'bg-black/80 py-3 backdrop-blur-xl border-b border-white/5' : 'py-6'
+        }`}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
+          <Link to="/" className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-white/60 hover:text-white transition">
+            <ArrowLeft className="h-4 w-4" /> Hub
           </Link>
-          <span className="text-lg" style={{ fontFamily: 'var(--font-blackletter)' }}>
-            Mexifino
-          </span>
-          <a
-            href="#booking"
-            className="shrink-0 rounded border border-neutral-900 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider hover:bg-neutral-900 hover:text-white sm:px-4 sm:text-xs"
-          >
+          <span className="font-gothic text-xl md:text-2xl">Mexifino</span>
+          <a href="#trial" className="rounded-none border border-white bg-white px-4 py-2 text-xs font-bold uppercase tracking-widest text-black hover:bg-transparent hover:text-white transition">
             Free trial
           </a>
         </div>
-      </header>
+      </motion.nav>
 
-      {/* Hero — real gym footage in the background */}
-      <VideoBackground
-        webmSrc="/video/mexifino-hero.webm"
-        mp4Src="/video/mexifino-hero.mp4"
-        overlayClassName="bg-gradient-to-b from-black/70 via-black/60 to-black/85"
-        fallbackClassName="bg-neutral-950"
-        className="flex min-h-[85vh] flex-col items-center justify-center border-b border-neutral-900 px-6 py-28 text-center text-white"
-      >
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-4 text-xs uppercase tracking-[0.35em] text-white/50"
-        >
-          Northfield, Minnesota
-        </motion.p>
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-7xl leading-none sm:text-9xl"
-          style={{ fontFamily: 'var(--font-blackletter)' }}
-        >
-          Mexifino
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-3 font-[Oswald] text-lg uppercase tracking-[0.3em] text-white/80 sm:text-xl"
-        >
-          Boxing Studio
-        </motion.p>
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mx-auto mt-6 max-w-xl text-white/60"
-        >
-          Where fight culture meets bold art. A full-service boxing studio for kids, adults, and everyone
-          starting from zero.
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-10 flex flex-wrap items-center justify-center gap-4"
-        >
-          <a href="#booking" className="rounded bg-white px-8 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:bg-white/85">
-            Book your free trial class
-          </a>
-          <a href="#programs" className="rounded border border-white/40 px-8 py-3 text-sm font-semibold uppercase tracking-wider text-white transition hover:border-white">
-            See our programs
-          </a>
-        </motion.div>
-      </VideoBackground>
+      {/* Hero — video bg */}
+      <section ref={heroRef} className="relative flex min-h-screen items-center justify-center overflow-hidden">
+        <video src="/media/mexifino-life-1.mp4" autoPlay loop muted playsInline className="absolute inset-0 h-full w-full object-cover" />
+        <motion.div style={{ opacity: scrimOpacity }} className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-black/40" />
 
-      {/* About / coach */}
-      <section className="mx-auto grid max-w-6xl gap-12 px-6 py-24 lg:grid-cols-2">
-        <Reveal>
-          <VideoBackground
-            webmSrc="/video/mexifino-training.webm"
-            mp4Src="/video/mexifino-training.mp4"
-            overlayClassName="bg-black/35"
-            fallbackClassName="bg-neutral-950"
-            className="relative flex aspect-square items-center justify-center rounded-lg border border-neutral-200"
+        <motion.div style={{ scale: wordmarkScale, y: wordmarkY }} className="relative z-10 mx-auto max-w-6xl px-6 text-center">
+          <motion.p
+            initial={{ opacity: 0, letterSpacing: '0.6em' }}
+            animate={{ opacity: 1, letterSpacing: '0.4em' }}
+            transition={{ delay: 0.4, duration: 1.2 }}
+            className="font-display text-xs uppercase text-white/70 md:text-sm"
           >
-            <span
-              className="pointer-events-none select-none text-[13rem] leading-none text-white/10"
-              style={{ fontFamily: 'var(--font-blackletter)' }}
-              aria-hidden
+            Northfield · Minnesota
+          </motion.p>
+
+          <motion.img
+            src="/media/mexifino-wordmark.png"
+            alt="Mexifino Boxing Studio"
+            initial={{ opacity: 0, y: 40, scale: 1.05 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.6, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto mt-8 w-[90%] max-w-3xl"
+            style={{ filter: 'invert(1)' }}
+          />
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className="mx-auto mt-8 max-w-md font-display text-base uppercase tracking-[0.25em] text-white/70"
+          >
+            Fight culture meets bold art.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.4 }}
+            className="mt-12 flex flex-wrap items-center justify-center gap-4"
+          >
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
+              href="#trial"
+              className="rounded-none bg-white px-8 py-4 font-display text-sm uppercase tracking-[0.25em] text-black hover:bg-white/80 transition"
             >
-              M
-            </span>
-            <span className="absolute bottom-6 left-6 text-xs uppercase tracking-[0.3em] text-white/70">
-              Live from the studio
-            </span>
-          </VideoBackground>
-        </Reveal>
-        <Reveal delay={0.1} className="flex flex-col justify-center">
-          <p className="mb-3 text-xs uppercase tracking-[0.3em] text-neutral-400">Coached by Jesse Tores</p>
-          <h2 className="mb-5 text-3xl font-semibold leading-snug">
-            Bright studio. Serious coaching. No lockers, no showers, no fluff.
-          </h2>
-          <p className="mb-4 text-neutral-500">
-            Mexifino brings a raw, art-forward take on the classic boxing gym — bold visuals on the walls, real
-            boxing in the ring. About a third of our members are women, and most people who walk through the
-            door aren't chasing a fight. They want to get stronger, get in shape, and learn how to handle
-            themselves.
-          </p>
-          <p className="text-neutral-500">
-            Coach Jesse trains alongside professional boxers who followed him to Minnesota — so whether you're
-            here for your first class or your next fight, you're training with the same standard.
-          </p>
-        </Reveal>
+              Book free trial
+            </motion.a>
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
+              href="#studio"
+              className="rounded-none border border-white/40 px-8 py-4 font-display text-sm uppercase tracking-[0.25em] text-white hover:border-white transition"
+            >
+              Meet the studio
+            </motion.a>
+          </motion.div>
+        </motion.div>
+
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.4em] text-white/40">
+          Scroll ↓
+        </div>
+      </section>
+
+      {/* Intro — big statement (bone / white section) */}
+      <section className="relative overflow-hidden bg-[var(--bone)] px-6 py-32 text-black">
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.06]"
+          style={{ backgroundImage: 'url(/media/mexifino-pattern.png)', backgroundSize: '400px' }}
+        />
+        <div className="relative mx-auto max-w-5xl">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-display text-xs uppercase tracking-[0.4em] text-black/50"
+          >
+            The studio
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="mt-6 font-gothic text-5xl leading-[0.95] md:text-8xl"
+          >
+            All-black walls. A ring
+            <br />
+            with black ropes.
+            <br />
+            <span className="italic">Bold art everywhere.</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="mt-10 max-w-2xl text-lg leading-relaxed text-black/70 md:text-xl"
+          >
+            Framed tattoo-flash pieces line the walls — eagles, serpents, koi, bold linework. Hand-painted graffiti
+            letters tile across the room in white on black. It's a gym that looks like a gallery and hits like a
+            gym.
+          </motion.p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="mt-6 max-w-2xl text-lg leading-relaxed text-black/70 md:text-xl"
+          >
+            No lockers. No showers. No frills. Just the work, the ring, the bags, and coaches who actually teach.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* Studio video 2 */}
+      <section id="studio" className="relative h-[70vh] overflow-hidden">
+        <video src="/media/mexifino-life-2.mp4" autoPlay loop muted playsInline className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 mx-auto max-w-6xl px-6 pb-16">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-display text-xs uppercase tracking-[0.4em] text-white/60"
+          >
+            Inside the studio
+          </motion.p>
+          <motion.h3
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-3 max-w-2xl font-gothic text-4xl md:text-6xl"
+          >
+            Where the real work happens.
+          </motion.h3>
+        </div>
+      </section>
+
+      {/* Coach */}
+      <section className="mx-auto max-w-7xl px-6 py-32">
+        <div className="grid gap-12 md:grid-cols-2 md:items-center">
+          <div>
+            <p className="font-display text-xs uppercase tracking-[0.4em] text-white/50">The coach</p>
+            <h2 className="mt-4 font-gothic text-5xl leading-tight md:text-7xl">
+              Jesse
+              <br />
+              Tores.
+            </h2>
+            <p className="mt-8 max-w-md text-white/70">
+              Owner, head coach, and the reason professional boxers followed him to Minnesota. Jesse trains
+              alongside working pros and everyday members with the same intensity — the difference is what you're
+              chasing.
+            </p>
+            <p className="mt-4 max-w-md text-white/70">
+              About a third of members are women. Most people join for fitness and self-defense, not to compete.
+              That's by design.
+            </p>
+          </div>
+          <div className="relative">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="aspect-square overflow-hidden rounded-none border border-white/10"
+            >
+              <video src="/media/mexifino-life-1.mp4" autoPlay loop muted playsInline className="h-full w-full object-cover" />
+            </motion.div>
+            <div
+              aria-hidden
+              className="absolute -inset-4 -z-10 opacity-30"
+              style={{ backgroundImage: 'url(/media/mexifino-pattern.png)', backgroundSize: '300px' }}
+            />
+          </div>
+        </div>
       </section>
 
       {/* Programs */}
-      <section id="programs" className="border-y border-neutral-200 bg-neutral-950 px-6 py-24 text-white">
-        <Reveal>
-          <h2 className="mb-2 text-center font-[Oswald] text-sm uppercase tracking-[0.3em] text-white/40">Programs</h2>
-          <p className="mb-14 text-center text-3xl font-semibold">Train your way</p>
-        </Reveal>
-        <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-2">
-          {programs.map((p, i) => (
-            <Reveal key={p.name} delay={i * 0.08}>
+      <section className="border-y border-white/10 bg-neutral-950 py-32">
+        <div className="mx-auto max-w-7xl px-6">
+          <p className="font-display text-xs uppercase tracking-[0.4em] text-white/50">Programs</p>
+          <h2 className="mt-4 max-w-2xl font-gothic text-5xl leading-tight md:text-7xl">Four ways in.</h2>
+          <div className="mt-16 grid gap-px bg-white/10 md:grid-cols-2">
+            {programs.map((p, i) => (
               <motion.div
-                whileHover={{ y: -4, borderColor: 'rgba(255,255,255,0.3)' }}
-                transition={{ duration: 0.2 }}
-                className="rounded-lg border border-white/10 p-6"
+                key={p.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ delay: i * 0.08 }}
+                whileHover={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
+                className="group bg-neutral-950 p-10 transition"
               >
-                <h3 className="mb-2 font-[Oswald] text-lg uppercase tracking-wide">{p.name}</h3>
-                <p className="text-sm text-white/50">{p.copy}</p>
+                <div className="flex items-baseline justify-between">
+                  <h3 className="font-gothic text-4xl md:text-5xl">{p.name}</h3>
+                  <span className="font-display text-xs text-white/30">0{i + 1}</span>
+                </div>
+                <p className="mt-4 max-w-md text-white/60">{p.tag}</p>
+                <div className="mt-6 h-px w-0 bg-white transition-all duration-500 group-hover:w-16" />
               </motion.div>
-            </Reveal>
-          ))}
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="mx-auto max-w-7xl px-6 py-24">
+        <div className="grid gap-12 md:grid-cols-4">
+          <Stat value={6} suffix=" days" label="Open Mon through Sat" />
+          <Stat value={30} suffix="%" label="Members who are women" />
+          <Stat value={1} suffix="" label="Boxing ring with black ropes" />
+          <Stat value={0} suffix="" label="Franchises, filler, or fluff" />
         </div>
       </section>
 
       {/* Schedule */}
-      <section className="mx-auto max-w-6xl px-6 py-24">
-        <Reveal>
-          <h2 className="mb-2 text-center font-[Oswald] text-sm uppercase tracking-[0.3em] text-neutral-400">Class schedule</h2>
-          <p className="mb-10 text-center text-3xl font-semibold">Sample weekly schedule</p>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <div className="rounded-lg border border-neutral-200 bg-neutral-950 p-6 text-white">
-            <ScheduleTable
-              days={days}
-              rows={rows}
-              accentTextClass="text-white/60"
-              chipClass="bg-white/15 text-white"
+      <section className="border-t border-white/10 bg-neutral-950 py-32">
+        <div className="mx-auto max-w-7xl px-6">
+          <p className="font-display text-xs uppercase tracking-[0.4em] text-white/50">Sample week</p>
+          <h2 className="mt-4 font-gothic text-5xl leading-tight md:text-7xl">The week ahead.</h2>
+          <p className="mt-4 text-xs italic text-white/40">Sample schedule — actual timetable to be finalized with the gym.</p>
+          <div className="mt-14 overflow-x-auto">
+            <div className="grid min-w-[900px] grid-cols-6 gap-px bg-white/10">
+              {schedule.map((day, i) => (
+                <motion.div
+                  key={day.day}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className="bg-black p-6"
+                >
+                  <p className="font-gothic text-2xl">{day.day}</p>
+                  <ul className="mt-6 space-y-3">
+                    {day.classes.map((c) => (
+                      <li key={c} className="text-xs text-white/70">
+                        {c}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trial form */}
+      <section id="trial" className="relative overflow-hidden bg-[var(--bone)] py-32 text-black">
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.05]"
+          style={{ backgroundImage: 'url(/media/mexifino-pattern.png)', backgroundSize: '500px' }}
+        />
+        <div className="relative mx-auto grid max-w-6xl gap-16 px-6 md:grid-cols-2">
+          <div>
+            <p className="font-display text-xs uppercase tracking-[0.4em] text-black/50">First class free</p>
+            <h2 className="mt-4 font-gothic text-5xl leading-[0.9] md:text-7xl">
+              Come in.
+              <br />
+              Try a round.
+            </h2>
+            <p className="mt-6 max-w-md text-black/70">
+              Wear something you can move in. Show up 15 minutes early. We'll wrap your hands.
+            </p>
+            <div className="mt-10 space-y-4 text-sm">
+              <div className="flex items-start gap-3">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>
+                  1500 Clinton Ln, Ste H
+                  <br />
+                  Northfield, MN 55057
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Phone className="h-4 w-4" />
+                <a href="tel:+17633415926" className="underline underline-offset-4">
+                  (763) 341-5926
+                </a>
+              </div>
+              <div className="flex items-center gap-3">
+                <Clock className="h-4 w-4" />
+                <span>Mon–Sat · 6:00am–7:30pm</span>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-none border border-black bg-black p-8 text-white md:p-10">
+            <TrialForm
+              accentClass="bg-white text-black hover:bg-white/80"
+              labelClass="text-white/50"
+              inputClass="bg-white/5 border-white/15 text-white placeholder:text-white/30 focus:border-white"
+              programs={['Boxing', 'Kickboxing', 'Personal Training', 'Group Fitness', 'Not sure yet']}
+              subtitle="One free class. Zero pressure."
             />
           </div>
-        </Reveal>
+        </div>
       </section>
 
-      {/* Booking */}
-      <section id="booking" className="border-t border-neutral-200 bg-neutral-950 px-6 py-24 text-white">
-        <Reveal className="mx-auto max-w-lg">
-          <h2 className="mb-2 text-center font-[Oswald] text-sm uppercase tracking-[0.3em] text-white/40">Get started</h2>
-          <p className="mb-8 text-center text-3xl font-semibold">Claim your free trial class</p>
-          <TrialBookingForm
-            classOptions={['Boxing', 'Kickboxing', 'Personal Training', 'Group Fitness']}
-            accentClass="border-white"
-            accentTextClass="text-white"
-            buttonClass="bg-white text-black hover:bg-neutral-200"
-          />
-        </Reveal>
-      </section>
-
-      {/* Location */}
-      <footer className="border-t border-neutral-200 px-6 py-14 text-center">
-        <p className="mb-1 font-semibold">Mexifino Boxing Studio</p>
-        <p className="text-sm text-neutral-500">1500 Clinton Ln, Ste H · Northfield, MN 55057</p>
-        <p className="text-sm text-neutral-500">(763) 341-5926 · Mon–Sat 6:00a – 7:30p</p>
-        <p className="mt-4 text-xs text-neutral-300">Design concept</p>
+      {/* Footer */}
+      <footer className="bg-black px-6 py-16 text-white border-t border-white/10">
+        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-4">
+          <div className="md:col-span-2">
+            <p className="font-gothic text-3xl">Mexifino Boxing Studio</p>
+            <p className="mt-4 max-w-sm text-sm text-white/50">
+              Real coaches, all-black walls, bold art on every surface. Fight culture in Northfield.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <a
+                href="https://instagram.com/mexifinoboxing"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex h-10 w-10 items-center justify-center border border-white/20 hover:border-white transition"
+              >
+                <Instagram className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+          <div>
+            <p className="font-display text-xs uppercase tracking-widest text-white/50">Visit</p>
+            <p className="mt-3 text-sm text-white/70">
+              1500 Clinton Ln, Ste H
+              <br />
+              Northfield, MN 55057
+            </p>
+            <p className="mt-3 text-sm text-white/70">(763) 341-5926</p>
+          </div>
+          <div>
+            <p className="font-display text-xs uppercase tracking-widest text-white/50">Hours</p>
+            <p className="mt-3 text-sm text-white/70">
+              Mon–Sat
+              <br />
+              6:00am – 7:30pm
+            </p>
+            <p className="mt-3 text-sm text-white/70">Closed Sundays</p>
+          </div>
+        </div>
+        <div className="mx-auto mt-16 flex max-w-7xl items-center justify-between border-t border-white/5 pt-6 text-xs text-white/30">
+          <span>© Mexifino Boxing Studio — concept 2026</span>
+          <Link to="/" className="hover:text-white">
+            ← Back to hub
+          </Link>
+        </div>
       </footer>
+
+      <PitchBadge tone="dark" />
+    </main>
+  )
+}
+
+function Stat({ value, suffix, label }: { value: number; suffix: string; label: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-50px' })
+  const [n, setN] = useState(0)
+  const spring = useSpring(0, { stiffness: 60, damping: 20 })
+  useEffect(() => {
+    if (inView) spring.set(value)
+    return spring.on('change', (v) => setN(Math.round(v)))
+  }, [inView, value, spring])
+  return (
+    <div ref={ref}>
+      <p className="font-gothic text-6xl md:text-7xl">
+        {n}
+        {suffix}
+      </p>
+      <p className="mt-3 text-xs uppercase tracking-widest text-white/50">{label}</p>
     </div>
   )
 }
