@@ -163,6 +163,35 @@ export default function AllIn() {
         </div>
       </section>
 
+      {/* Training photo */}
+      <section className="relative h-[60vh] overflow-hidden">
+        <img
+          src="/media/allin-photo-mitts.jpg"
+          alt="Coach working mitts with a young fighter"
+          className="absolute inset-0 h-full w-full object-cover grayscale"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10" />
+        <div className="absolute inset-0 bg-[oklch(0.76_0.14_180/0.08)] mix-blend-overlay" />
+        <div className="absolute inset-x-0 bottom-0 mx-auto max-w-6xl px-6 pb-16">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-display text-xs uppercase tracking-[0.4em] text-teal"
+          >
+            On the mats
+          </motion.p>
+          <motion.h3
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-3 max-w-2xl font-gothic text-4xl md:text-6xl"
+          >
+            One rep, one round at a time.
+          </motion.h3>
+        </div>
+      </section>
+
       {/* Schedule */}
       <section className="border-t border-white/10 bg-neutral-950 py-32">
         <div className="mx-auto max-w-7xl px-6">

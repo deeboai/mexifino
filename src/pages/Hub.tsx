@@ -69,9 +69,8 @@ export default function Hub() {
           delay={0.35}
           name="Mexifino Boxing Studio"
           tag="Northfield, MN · Fight culture meets bold art"
-          logo="/media/mexifino-wordmark.png"
+          watermark="Mexifino"
           accent="bone"
-          invertLogo
         />
       </section>
 
@@ -85,6 +84,7 @@ function ClubCard({
   name,
   tag,
   logo,
+  watermark,
   accent,
   delay,
   invertLogo,
@@ -92,7 +92,8 @@ function ClubCard({
   to: string
   name: string
   tag: string
-  logo: string
+  logo?: string
+  watermark?: string
   accent: 'teal' | 'bone'
   delay: number
   invertLogo?: boolean
@@ -114,13 +115,24 @@ function ClubCard({
         className={`group relative block h-[520px] overflow-hidden rounded-2xl border border-white/10 bg-neutral-950 transition-all duration-700 hover:border-white/30 ${glow}`}
       >
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          <motion.img
-            src={logo}
-            alt=""
-            className={`h-[70%] w-auto object-contain opacity-40 transition-all duration-1000 group-hover:scale-110 group-hover:opacity-70 ${invertLogo ? 'invert' : ''}`}
-            initial={{ scale: 1.1 }}
-            whileInView={{ scale: 1 }}
-          />
+          {logo ? (
+            <motion.img
+              src={logo}
+              alt=""
+              className={`h-[70%] w-auto object-contain opacity-40 transition-all duration-1000 group-hover:scale-110 group-hover:opacity-70 ${invertLogo ? 'invert' : ''}`}
+              initial={{ scale: 1.1 }}
+              whileInView={{ scale: 1 }}
+            />
+          ) : (
+            <motion.span
+              aria-hidden
+              className="font-gothic text-[7rem] uppercase leading-none text-white/10 transition-all duration-1000 group-hover:scale-110 group-hover:text-white/20 md:text-[10rem]"
+              initial={{ scale: 1.1 }}
+              whileInView={{ scale: 1 }}
+            >
+              {watermark}
+            </motion.span>
+          )}
         </div>
 
         <div className="absolute inset-0 scrim-b" />

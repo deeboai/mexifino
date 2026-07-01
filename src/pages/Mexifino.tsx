@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
-import { ArrowLeft, MapPin, Phone, Clock, Instagram } from 'lucide-react'
+import { ArrowLeft, MapPin, Phone, Clock } from 'lucide-react'
 import { TrialForm } from '../components/TrialForm'
 import { PitchBadge } from '../components/PitchBadge'
 
@@ -73,15 +73,14 @@ export default function Mexifino() {
             Northfield · Minnesota
           </motion.p>
 
-          <motion.img
-            src="/media/mexifino-wordmark.png"
-            alt="Mexifino Boxing Studio"
+          <motion.h1
             initial={{ opacity: 0, y: 40, scale: 1.05 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.6, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-auto mt-8 w-[90%] max-w-3xl"
-            style={{ filter: 'invert(1)' }}
-          />
+            className="mx-auto mt-8 font-gothic text-6xl uppercase leading-none text-white sm:text-8xl md:text-9xl"
+          >
+            Mexifino
+          </motion.h1>
 
           <motion.p
             initial={{ opacity: 0 }}
@@ -145,11 +144,11 @@ export default function Mexifino() {
             transition={{ delay: 0.1 }}
             className="mt-6 font-gothic text-5xl leading-[0.95] md:text-8xl"
           >
-            All-black walls. A ring
+            Black walls.
             <br />
-            with black ropes.
+            A real ring.
             <br />
-            <span className="italic">Bold art everywhere.</span>
+            <span className="italic">Art you can't ignore.</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
@@ -158,9 +157,8 @@ export default function Mexifino() {
             transition={{ delay: 0.3 }}
             className="mt-10 max-w-2xl text-lg leading-relaxed text-black/70 md:text-xl"
           >
-            Framed tattoo-flash pieces line the walls — eagles, serpents, koi, bold linework. Hand-painted graffiti
-            letters tile across the room in white on black. It's a gym that looks like a gallery and hits like a
-            gym.
+            Tattoo-flash art and hand-painted lettering cover the walls floor to ceiling. It's the kind of gym you'd
+            want to hang out in even if you never threw a punch — and then you throw a few anyway.
           </motion.p>
           <motion.p
             initial={{ opacity: 0 }}
@@ -169,7 +167,7 @@ export default function Mexifino() {
             transition={{ delay: 0.4 }}
             className="mt-6 max-w-2xl text-lg leading-relaxed text-black/70 md:text-xl"
           >
-            No lockers. No showers. No frills. Just the work, the ring, the bags, and coaches who actually teach.
+            No frills, no fluff — a ring, heavy bags, and coaches who actually pay attention to your technique.
           </motion.p>
         </div>
       </section>
@@ -214,8 +212,8 @@ export default function Mexifino() {
               chasing.
             </p>
             <p className="mt-4 max-w-md text-white/70">
-              About a third of members are women. Most people join for fitness and self-defense, not to compete.
-              That's by design.
+              Most people who walk in aren't chasing a fight — they want to get in shape and learn how to handle
+              themselves. That's exactly who this gym is built for.
             </p>
           </div>
           <div className="relative">
@@ -226,7 +224,7 @@ export default function Mexifino() {
               transition={{ duration: 0.8 }}
               className="aspect-square overflow-hidden rounded-none border border-white/10"
             >
-              <video src="/media/mexifino-life-1.mp4" autoPlay loop muted playsInline className="h-full w-full object-cover" />
+              <img src="/media/mexifino-photo-stance.jpg" alt="Coach Jesse Tores in fight stance" className="h-full w-full object-cover" />
             </motion.div>
             <div
               aria-hidden
@@ -265,11 +263,41 @@ export default function Mexifino() {
         </div>
       </section>
 
+      {/* Gallery */}
+      <section className="mx-auto max-w-7xl px-6 py-32">
+        <p className="font-display text-xs uppercase tracking-[0.4em] text-white/50">Life at the studio</p>
+        <h2 className="mt-4 max-w-2xl font-gothic text-5xl leading-tight md:text-7xl">Show up. Get to work.</h2>
+        <div className="mt-16 grid grid-cols-2 gap-3 md:grid-cols-3">
+          {[
+            { src: '/media/mexifino-photo-crew.jpg', alt: 'Fighter and coaches backstage after a bout', aspect: 'aspect-[4/5]', wide: true },
+            { src: '/media/mexifino-photo-sparring.jpg', alt: 'Sparring in the ring under the studio wall art', aspect: 'aspect-[4/5]' },
+            { src: '/media/mexifino-photo-punch.jpg', alt: 'Member throwing a punch on the bag in Mexifino gear', aspect: 'aspect-[4/5]' },
+            { src: '/media/mexifino-photo-lifestyle.jpg', alt: 'Member in Mexifino brand gear by the ring', aspect: 'aspect-[4/5]' },
+            { src: '/media/mexifino-photo-mitts.jpg', alt: 'Coach working mitts with a young fighter', aspect: 'aspect-[4/5]' },
+          ].map((img, i) => (
+            <motion.div
+              key={img.src}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ delay: i * 0.06 }}
+              className={`group overflow-hidden ${img.aspect} ${img.wide ? 'col-span-2 md:col-span-1' : ''}`}
+            >
+              <img
+                src={img.src}
+                alt={img.alt}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* Stats */}
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="grid gap-12 md:grid-cols-4">
           <Stat value={6} suffix=" days" label="Open Mon through Sat" />
-          <Stat value={30} suffix="%" label="Members who are women" />
+          <Stat value={4} suffix="" label="Programs to choose from" />
           <Stat value={1} suffix="" label="Boxing ring with black ropes" />
           <Stat value={0} suffix="" label="Franchises, filler, or fluff" />
         </div>
@@ -366,16 +394,6 @@ export default function Mexifino() {
             <p className="mt-4 max-w-sm text-sm text-white/50">
               Real coaches, all-black walls, bold art on every surface. Fight culture in Northfield.
             </p>
-            <div className="mt-6 flex gap-3">
-              <a
-                href="https://instagram.com/mexifinoboxing"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex h-10 w-10 items-center justify-center border border-white/20 hover:border-white transition"
-              >
-                <Instagram className="h-4 w-4" />
-              </a>
-            </div>
           </div>
           <div>
             <p className="font-display text-xs uppercase tracking-widest text-white/50">Visit</p>
